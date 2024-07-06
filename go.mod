@@ -1,3 +1,3 @@
-module zappem.net/pub/io/pair
+module zappem.net/pub/net/pair
 
 go 1.21.11

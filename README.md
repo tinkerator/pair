@@ -2,11 +2,13 @@
 
 ## Overview
 
-The PurpleAir sensors provide a local access json API. This package
-wraps that in a Go API.
+The [PurpleAir](https://purpleair.com) sensors provide a local access
+JSON API.  This package wraps that in a [Go
+API](https://pkg.go.dev/zappem.net/pub/net/pair).
 
-This package includes an [examples/query.go](examples/query.go)
-program to view some sensor readings.
+This `"zappem.net/pub/net/pair"` package includes an
+[examples/query.go](examples/query.go) program to view some sensor
+readings.
 
 An example way to use this tool:
 ```

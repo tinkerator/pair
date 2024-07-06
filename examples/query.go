@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"zappem.net/pub/io/pair"
+	"zappem.net/pub/net/pair"
 )
 
 // Program query performs a local query to a PurpleAir sensor and
