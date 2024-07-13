@@ -98,10 +98,16 @@ func NewSensor(addr string) *Sensor {
 }
 
 // TempAdjust sets the polynomial expansion parameters to convert raw
-// temperature measurements to calibrated values. For the sensor this
-// code was developed for, fitting a polynomial to readings of a
-// digital thermometer, placed next to it, we have the following
-// coefficients: {TODO}.
+// temperature measurements to calibrated values. This adjustment is
+// applied every time one of the (*Sensor) temperature() functions are
+// called. The default is to not adjust the values, i.e. 1:1.
+//
+// For reference, the sensor this code was developed for, fitting a
+// polynomial to readings of a digital thermometer placed next to it,
+// we use the following coefficients: {-8.9037,1.0441}. This is a
+// linear fit with the raw values are 9F too high, and the individual
+// raw F measurements appear to be about 4% smaller than a calibrated
+// F unit.
 func (s *Sensor) TempAdjust(coef []float64) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

@@ -14,10 +14,11 @@ import (
 // displays the current sensor measurements.
 
 var (
-	addr  = flag.String("sensor", "", "local network address of sensor")
-	poll  = flag.Duration("poll", 0*time.Second, "non-zero polls with this interval")
-	retry = flag.Int("retry", 3, "default number of times to retry request - once a second")
-	coef  = flag.String("coef", "-8.9037,1.0441", "comma separated coefficients for temperature conversion")
+	addr    = flag.String("sensor", "", "local network address of sensor")
+	poll    = flag.Duration("poll", 0*time.Second, "non-zero polls with this interval")
+	retry   = flag.Int("retry", 3, "default number of times to retry request - once a second, after which can exponentially backoff")
+	backoff = flag.Bool("backoff", true, "if --poll != 0, should a --retry reads fail, backoff exponentially but don't give up")
+	coef    = flag.String("coef", "-8.9037,1.0441", "comma separated coefficients for temperature conversion")
 )
 
 func main() {
@@ -39,6 +40,7 @@ func main() {
 		s.TempAdjust(cs)
 	}
 	retries := *retry
+	bo := time.Duration(0)
 	for {
 		if err := s.Refresh(); err != nil {
 			if retries > 0 {
@@ -46,7 +48,17 @@ func main() {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			log.Fatalf("failed to refresh: %v (after %d tries)", err, *retry)
+			if !*backoff {
+				log.Fatalf("failed to read sensor after --retry=%d attempts", *retry)
+			}
+			if bo == 0 {
+				bo = time.Second
+			} else {
+				bo *= 2
+			}
+			log.Printf("retrying with backoff (%v)", bo)
+			time.Sleep(bo)
+			continue
 		}
 		t := s.Temp()
 		tC := pair.FtoC(t)
@@ -61,5 +73,7 @@ func main() {
 			break
 		}
 		time.Sleep(*poll)
+		retries = *retry
+		bo = 0
 	}
 }
